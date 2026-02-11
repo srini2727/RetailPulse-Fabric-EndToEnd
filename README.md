@@ -383,18 +383,7 @@ These tables power the "Data Ops Monitor" page in Power BI for **observability**
 
 ---
 
-## 🎬 Demo Walkthrough
 
-**5-Minute Live Demo Flow:**
-1. (30s) Show operational SQL DB with OLTP tables
-2. (1m) Run notebook: Bronze ingest → show Delta tables + row counts
-3. (1m) Show Silver quality logs → how we caught 47 bad rows
-4. (1m) Show warehouse star schema → Power BI executive page
-5. (1m) Show real-time dashboard refreshing live
-
-**Full script & timing notes**: See [00_docs/demo_walkthrough.md](00_docs/demo_walkthrough.md)
-
----
 
 ## 🔐 Governance & Security Patterns
 
@@ -430,23 +419,6 @@ See [06_ops_governance/rls_plan.md](06_ops_governance/rls_plan.md) for full secu
 
 ---
 
-## 💡 Interview Talking Points
-
-**"Why should I care about this project?"**
-- Shows understanding of **modern analytics architecture** (medallion pattern)
-- Demonstrates **data quality thinking** (not just ETL, but validation)
-- Proves ability to **design for scale** (100k+ rows, incremental loads)
-- Illustrates **governance** (ops monitoring, audit trails, RLS-ready)
-- Balances **batch + real-time** (complex coordination, not just one or the other)
-
-**"What would I change in production?"**
-- Replace hardcoded values with environment config (config.template.json)
-- Add schema registry for real-time events (CloudEvents standard)
-- Implement CI/CD with Fabric Git integration
-- Add data contracts between layers (enforce column names, types)
-- Scale to 1B+ rows with partitioning strategy
-
----
 
 ## 📞 Contact
 

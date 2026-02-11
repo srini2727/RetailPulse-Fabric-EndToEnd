@@ -1,0 +1,82 @@
+// =====================================================
+// RetailPulse Eventhouse tables + mappings
+// Database: rp_eventhouse_dev
+// Table   : rt_order_events
+// =====================================================
+
+// 1) Create table
+.create-merge table rt_order_events (
+    event_time: datetime,
+    event_type: string,
+    order_id: long,
+    channel: string,
+    payment_type: string,
+    amount: real,
+    country: string,
+    reason: string,
+    product_id: long,
+    inventory_level: int,
+    threshold: int,
+    correlation_id: guid
+)
+
+// 2) Create JSON ingestion mapping
+.create-or-alter table rt_order_events ingestion json mapping "rt_order_events_json"
+[
+  {"column":"event_time","path":"$.event_time","datatype":"datetime"},
+  {"column":"event_type","path":"$.event_type","datatype":"string"},
+  {"column":"order_id","path":"$.order_id","datatype":"long"},
+  {"column":"channel","path":"$.channel","datatype":"string"},
+  {"column":"payment_type","path":"$.payment_type","datatype":"string"},
+  {"column":"amount","path":"$.amount","datatype":"real"},
+  {"column":"country","path":"$.country","datatype":"string"},
+  {"column":"reason","path":"$.reason","datatype":"string"},
+  {"column":"product_id","path":"$.product_id","datatype":"long"},
+  {"column":"inventory_level","path":"$.inventory_level","datatype":"int"},
+  {"column":"threshold","path":"$.threshold","datatype":"int"},
+  {"column":"correlation_id","path":"$.correlation_id","datatype":"guid"}
+]
+
+// 3) lightweight functions used by dashboard tiles
+
+.create-or-alter function with (docstring = "Orders last 5 minutes")
+rt_orders_last5m() {
+  rt_order_events
+  | where event_time > ago(5m)
+  | where event_type == "OrderCreated"
+  | summarize OrdersLast5Min = count()
+}
+
+.create-or-alter function with (docstring = "Revenue last 5 minutes")
+rt_revenue_last5m() {
+  rt_order_events
+  | where event_time > ago(5m)
+  | where event_type == "OrderCreated"
+  | summarize RevenueLast5Min = sum(amount)
+}
+
+.create-or-alter function with (docstring = "AOV last 15 minutes")
+rt_aov_last15m() {
+  rt_order_events
+  | where event_time > ago(15m)
+  | where event_type == "OrderCreated"
+  | summarize Orders = count(), Revenue = sum(amount)
+  | extend AOVLast15Min = iif(Orders == 0, 0.0, Revenue / Orders)
+  | project AOVLast15Min
+}
+
+.create-or-alter function with (docstring = "Payment failures last 15 minutes")
+rt_payment_failed_last15m() {
+  rt_order_events
+  | where event_time > ago(15m)
+  | where event_type == "PaymentFailed"
+  | summarize PaymentFailedLast15Min = count()
+}
+
+.create-or-alter function with (docstring = "Inventory low events last 15 minutes")
+rt_inventory_low_last15m() {
+  rt_order_events
+  | where event_time > ago(15m)
+  | where event_type == "InventoryLow"
+  | summarize InventoryLowLast15Min = count()
+}

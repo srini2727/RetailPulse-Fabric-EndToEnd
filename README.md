@@ -6,7 +6,6 @@
 
 ---
 
-## 🎯 Executive Summary
 
 **RetailPulse** demonstrates a real-world architecture where a retail company operates three synchronized data pipelines:
 
